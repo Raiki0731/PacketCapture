@@ -93,6 +93,7 @@ typedef struct {
 	unsigned short winSize;						// ウインドウ・サイズ
 	unsigned short checksum;					// チェックサム
 	unsigned short urgent;						// 緊急ポインタ
+	unsigned char data[16];
 } TCPHEADER;
 
 
