@@ -118,7 +118,6 @@ int main(int argc, char *argv[])
 
                 dsp_udp_protocol(udp);
 
-                printf("\n");
                 break;
 
             case 0x06:
@@ -228,6 +227,7 @@ void dsp_ip_header(IPHEADER ip)
     }
 
     fflush(stdout);
+    printf("\t");
 }
 
 void dsp_icmp_protocol(ICMPDATA icmp)
@@ -246,13 +246,11 @@ void dsp_icmp_protocol(ICMPDATA icmp)
     default:
         break;
     }
-    printf("\n");
 }
 
 void dsp_udp_protocol(UDPHEADER udp)
 {
     printf("%d -> %d Len=%d\n", ntohs(udp.srcPort), ntohs(udp.destPort), ntohs(udp.length));
-    printf("\n");
 }
 
 void dsp_tcp_protocol(TCPHEADER tcp)
@@ -288,5 +286,4 @@ void dsp_tcp_protocol(TCPHEADER tcp)
         printf("\n");
         break;
     }
-    printf("\n");
 }
