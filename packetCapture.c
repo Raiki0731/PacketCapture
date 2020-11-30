@@ -66,11 +66,13 @@ int main(int argc, char *argv[])
         if (ether.type[0] == 0x08 && ether.type[1] == 0x06)
         {
             dsp_ether_header(ether);
-            printf("  %4d ", byte);
+            printf("    %4d ", byte);
             printf("%-4s ", "ARP");
 
             memcpy(&arp, buf + etherSize, sizeof(ARPDATA));
             dsp_arp_protocol(arp);
+
+            printf("\n");
         }
         else if (ether.type[0] == 0x08 && ether.type[1] == 0x00)
         {
@@ -81,12 +83,12 @@ int main(int argc, char *argv[])
             }
             ip.protocol = buf[23];
             dsp_ip_header(ip);
-            printf("\t");
+            printf("  ");
 
             switch (ip.protocol)
             {
             case 0x01:
-                printf("%4d ", byte);
+                printf("  %4d ", byte);
                 printf("%-4s ", "ICMP");
 
                 icmp.type = buf[34];
@@ -97,11 +99,10 @@ int main(int argc, char *argv[])
 
                 dsp_icmp_protocol(icmp);
 
-                printf("\n");
                 break;
 
             case 0x11:
-                printf("%4d ", byte);
+                printf("  %4d ", byte);
                 printf("%-4s ", "UDP");
 
                 tmp[0] = buf[34];
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
                 break;
 
             case 0x06:
-                printf("%4d ", byte);
+                printf("  %4d ", byte);
                 printf("%-4s ", "TCP");
 
                 tmp[0] = buf[34];
@@ -146,12 +147,6 @@ int main(int argc, char *argv[])
                 }
                 memcpy(&tcp.ack, tmp, sizeof(tcp.ack));
 
-                memset(tcp.data, '\0', sizeof(tcp.data));
-                for (i = 0; i < 14; i++)
-                {
-                    tcp.data[i] = buf[66+i];
-                }
-                
                 dsp_tcp_protocol(tcp);
 
                 break;
@@ -209,25 +204,23 @@ void dsp_arp_protocol(ARPDATA arp)
     }
 
     fflush(stdout);
-    printf("\n");
 }
 
 void dsp_ip_header(IPHEADER ip)
 {
     int i;
     printf("%d", ip.srcIP[0]);
-    for (i = 1; i <= 3; i++)
+    for (i = 0; i < 3; i++)
     {
         printf(".%d", ip.srcIP[i]);
     }
     printf(" > %d", ip.destIP[0]);
-    for (i = 1; i <= 3; i++)
+    for (i = 0; i < 3; i++)
     {
         printf(".%d", ip.destIP[i]);
     }
 
     fflush(stdout);
-    printf("\t");
 }
 
 void dsp_icmp_protocol(ICMPDATA icmp)
@@ -256,30 +249,27 @@ void dsp_udp_protocol(UDPHEADER udp)
 void dsp_tcp_protocol(TCPHEADER tcp)
 {
     printf("%d -> %d ", ntohs(tcp.srcPort), ntohs(tcp.destPort));
+
     switch (tcp.signal)
     {
     case 0x10:
-        printf("[ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
+        printf("[ACK] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
         break;
 
     case 0x02:
-        printf("[SYN] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
+        printf("[SYN] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
         break;
 
     case 0x01:
-        printf("[FIN] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
+        printf("[FIN] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
         break;
 
     case 0x12:
-        printf("[SYN, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
-        break;
-    
-    case 0x18:
-        printf("[PSH, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
+        printf("[SYN, ACK] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
         break;
 
     case 0x11:
-        printf("[FIN, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
+        printf("[FIN, ACK] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
         break;
 
     default:
