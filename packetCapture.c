@@ -150,9 +150,9 @@ int main(int argc, char *argv[])
                 memset(tcp.data, '\0', sizeof(tcp.data));
                 for (i = 0; i < 14; i++)
                 {
-                    tcp.data[i] = buf[66+i];
+                    tcp.data[i] = buf[66 + i];
                 }
-                
+
                 dsp_tcp_protocol(tcp);
 
                 break;
@@ -273,7 +273,7 @@ void dsp_tcp_protocol(TCPHEADER tcp)
     case 0x12:
         printf("[SYN, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
-    
+
     case 0x18:
         printf("[PSH, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
