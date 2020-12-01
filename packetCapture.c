@@ -147,6 +147,12 @@ int main(int argc, char *argv[])
                 }
                 memcpy(&tcp.ack, tmp, sizeof(tcp.ack));
 
+                memset(tcp.data, '\0', sizeof(tcp.data));
+                for (i = 0; i < 14; i++)
+                {
+                    tcp.data[i] = buf[66+i];
+                }
+                
                 dsp_tcp_protocol(tcp);
 
                 break;
@@ -253,23 +259,27 @@ void dsp_tcp_protocol(TCPHEADER tcp)
     switch (tcp.signal)
     {
     case 0x10:
-        printf("[ACK] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
+        printf("[ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
 
     case 0x02:
-        printf("[SYN] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
+        printf("[SYN] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
 
     case 0x01:
-        printf("[FIN] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
+        printf("[FIN] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
 
     case 0x12:
-        printf("[SYN, ACK] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
+        printf("[SYN, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
+        break;
+    
+    case 0x18:
+        printf("[PSH, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
 
     case 0x11:
-        printf("[FIN, ACK] seq=%x ack=%x\n", ntohs(tcp.seq), ntohs(tcp.ack));
+        printf("[FIN, ACK] seq=%08x ack=%08x  %s\n", ntohl(tcp.seq), ntohl(tcp.ack), tcp.data);
         break;
 
     default:
